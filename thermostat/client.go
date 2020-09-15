@@ -56,7 +56,7 @@ func (t *Thermostat) GetAPIInfo() (*APIInfo, error) {
 	return &info, nil
 }
 
-func (t *Thermostat) QueryInfo() (*QueryInfo, error) {
+func (t *Thermostat) GetQueryInfo() (*QueryInfo, error) {
 	req, err := http.NewRequest("GET", t.url("/query/info"), nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating query info request")
