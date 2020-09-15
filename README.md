@@ -1,0 +1,3 @@
+# Venstar Go library
+
+(WIP)
