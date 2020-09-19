@@ -1,7 +1,0 @@
-github.com/influxdata/influxdb1-client v0.0.0-20200827194710-b269163b24ab h1:HqW4xhhynfjrtEiiSGcQUd6vrK23iMam1FO8rI7mwig=
-github.com/influxdata/influxdb1-client v0.0.0-20200827194710-b269163b24ab/go.mod h1:qj24IKcXYK6Iy9ceXlo3Tc+vtHo9lIhSX5JddghvEPo=
-github.com/mikemrm/go-venstar v0.0.0-20200919155352-83016d49a25b h1:Bf/8vPnCllsbk/u4tssXqilELkW2reEzk7V+SSAO/+w=
-github.com/mikemrm/go-venstar/thermostat v0.0.0-20200919155352-83016d49a25b h1:bn3YWPe1aZF3+jWQZ7f7r4c75FF5DbkHTHuIFYhYu5I=
-github.com/mikemrm/go-venstar/thermostat v0.0.0-20200919155352-83016d49a25b/go.mod h1:6pl1/cmV+TlgNuUXlxVz6dN0hKxF1dGDGFXuOWJhhKA=
-github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
-github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
