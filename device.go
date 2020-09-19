@@ -1,6 +1,8 @@
 package venstar
 
 import (
+	"errors"
+
 	"github.com/mikemrm/go-venstar/thermostat"
 )
 
