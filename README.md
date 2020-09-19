@@ -17,7 +17,7 @@ Query Info:
   FanState           : off (0)
   ActiveStage        : 0
   TempUnits          : fahrenheit (0)
-  Schedule           : active (0)
+  Schedule           : inactive (0)
   SchedulePart       : inactive (255)
   Away               : home (0)
   Holiday            : not observing (0)

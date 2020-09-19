@@ -109,9 +109,9 @@ type Schedule int
 func (f Schedule) String() string {
 	switch f {
 	case 0:
-		return "active"
-	case 1:
 		return "inactive"
+	case 1:
+		return "active"
 	}
 	return ""
 }
