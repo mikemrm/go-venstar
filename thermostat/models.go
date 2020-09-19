@@ -1,5 +1,11 @@
 package thermostat
 
+import (
+	"encoding/json"
+	"strings"
+	"time"
+)
+
 type APIInfo struct {
 	Version  int    `json:"api_ver"`
 	Model    string `json:"model"`
@@ -49,15 +55,38 @@ type Sensor struct {
 }
 
 type Runtime struct {
-	Time  int `json:"ts"`
-	Heat1 int `json:"heat1"`
-	Heat2 int `json:"heat2"`
-	Cool1 int `json:"cool1"`
-	Cool2 int `json:"cool2"`
-	Aux1  int `json:"aux1"`
-	Aux2  int `json:"aux2"`
-	FC    int `json:"fc,omitempty"`
-	OV    int `json:"ov,omitempty"`
+	Timestamp   time.Time
+	Heaters     map[string]int
+	Coolers     map[string]int
+	Aux         map[string]int
+	FreeCooling int
+	Override    int
+}
+
+func (r *Runtime) UnmarshalJSON(data []byte) error {
+	jdata := make(map[string]int)
+	if err := json.Unmarshal(data, &jdata); err != nil {
+		return err
+	}
+	r.Heaters = make(map[string]int)
+	r.Coolers = make(map[string]int)
+	r.Aux = make(map[string]int)
+	for k, v := range jdata {
+		if k == "ts" {
+			r.Timestamp = time.Unix(int64(v), 0)
+		} else if k == "fc" {
+			r.FreeCooling = v
+		} else if k == "ov" {
+			r.Override = v
+		} else if strings.HasPrefix(k, "heat") {
+			r.Heaters[strings.TrimPrefix(k, "heat")] = v
+		} else if strings.HasPrefix(k, "cool") {
+			r.Coolers[strings.TrimPrefix(k, "cool")] = v
+		} else if strings.HasPrefix(k, "aux") {
+			r.Aux[strings.TrimPrefix(k, "aux")] = v
+		}
+	}
+	return nil
 }
 
 type Alert struct {
