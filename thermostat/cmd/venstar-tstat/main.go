@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"strconv"
+	"sort"
 	"strings"
 
 	"github.com/mikemrm/go-venstar/thermostat"
@@ -88,19 +88,19 @@ func printRuntimes(runtimes []*thermostat.Runtime) {
 	for i, runtime := range runtimes {
 		values := make(map[string]string)
 		values["Timestamp"] = runtime.Timestamp.Format(tsFormat)
-		values["Free Cooling"] = strconv.Itoa(runtime.FreeCooling)
-		values["Override"] = strconv.Itoa(runtime.Override)
+		values["Free Cooling"] = runtime.FreeCooling.String()
+		values["Override"] = runtime.Override.String()
 		for k, v := range runtime.Heaters {
 			idx := "Heat " + k
-			values[idx] = strconv.Itoa(v)
+			values[idx] = v.String()
 		}
 		for k, v := range runtime.Coolers {
 			idx := "Cool " + k
-			values[idx] = strconv.Itoa(v)
+			values[idx] = v.String()
 		}
 		for k, v := range runtime.Aux {
 			idx := "Aux " + k
-			values[idx] = strconv.Itoa(v)
+			values[idx] = v.String()
 		}
 		for k, v := range values {
 			vLen := len(v)
@@ -114,31 +114,39 @@ func printRuntimes(runtimes []*thermostat.Runtime) {
 		}
 		rowValues[i] = values
 	}
-	colOrder := make([]string, len(colWidths))
-	colOrder[0] = "Timestamp"
-	colOrder[len(colWidths)-2] = "Free Cooling"
-	colOrder[len(colWidths)-1] = "Override"
-	colNext := 1
+	columns := make([]string, len(colWidths))
+	colNext := 0
 	for k := range colWidths {
+		columns[colNext] = k
+		colNext++
+	}
+	sort.Strings(columns)
+
+	colOrder := make([]string, len(columns))
+	colOrder[0] = "Timestamp"
+	colOrder[len(columns)-2] = "Free Cooling"
+	colOrder[len(columns)-1] = "Override"
+	colNext = 1
+	for _, k := range columns {
 		if strings.HasPrefix(k, "Heat") {
 			colOrder[colNext] = k
 			colNext++
 		}
 	}
-	for k := range colWidths {
+	for _, k := range columns {
 		if strings.HasPrefix(k, "Cool") {
 			colOrder[colNext] = k
 			colNext++
 		}
 	}
-	for k := range colWidths {
+	for _, k := range columns {
 		if strings.HasPrefix(k, "Aux") {
 			colOrder[colNext] = k
 			colNext++
 		}
 	}
-	divBits := make([]string, len(colWidths))
-	values := make([]string, len(colWidths))
+	divBits := make([]string, len(columns))
+	values := make([]string, len(columns))
 	for i, k := range colOrder {
 		width := colWidths[k]
 		values[i] = fmt.Sprintf("%-*s", width, k)
@@ -151,7 +159,7 @@ func printRuntimes(runtimes []*thermostat.Runtime) {
 	for _, row := range rowValues {
 		for i, k := range colOrder {
 			width := colWidths[k]
-			values[i] = fmt.Sprintf("%*s", width, row[k])
+			values[i] = fmt.Sprintf("%-*s", width, row[k])
 		}
 		fmt.Printf("  | %s |\n", strings.Join(values, " | "))
 	}
