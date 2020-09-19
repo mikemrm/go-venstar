@@ -1,9 +1,5 @@
 package thermostat
 
-import (
-	"time"
-)
-
 type APIInfo struct {
 	Version  int    `json:"api_ver"`
 	Model    string `json:"model"`
@@ -48,24 +44,24 @@ type QueryResponse struct {
 }
 
 type Sensor struct {
-	Name string `json:"name"`
-	Temp int    `json:"temp"`
+	Name string  `json:"name"`
+	Temp float64 `json:"temp"`
 }
 
 type Runtime struct {
-	Time  time.Time `json:"ts"`
-	Heat1 int       `json:"heat1"`
-	Heat2 int       `json:"heat2"`
-	Cool1 int       `json:"cool1"`
-	Cool2 int       `json:"cool2"`
-	Aux1  int       `json:"aux1"`
-	Aux2  int       `json:"aux2"`
-	FC    int       `json:"fc,omitempty"`
-	OV    int       `json:"ov,omitempty"`
+	Time  int `json:"ts"`
+	Heat1 int `json:"heat1"`
+	Heat2 int `json:"heat2"`
+	Cool1 int `json:"cool1"`
+	Cool2 int `json:"cool2"`
+	Aux1  int `json:"aux1"`
+	Aux2  int `json:"aux2"`
+	FC    int `json:"fc,omitempty"`
+	OV    int `json:"ov,omitempty"`
 }
 
 type Alert struct {
-	Name   string `json:"alert"`
+	Name   string `json:"name"`
 	Active bool   `json:"active"`
 }
 
@@ -86,6 +82,14 @@ func (cr *ControlRequest) SetFan(value int) *ControlRequest {
 	cr.Fan = new(int)
 	*cr.Fan = value
 	return cr
+}
+
+func (cr *ControlRequest) FanAuto() *ControlRequest {
+	return cr.SetFan(0)
+}
+
+func (cr *ControlRequest) FanOn() *ControlRequest {
+	return cr.SetFan(1)
 }
 
 func (cr *ControlRequest) SetHeatTemp(value int) *ControlRequest {
@@ -118,7 +122,7 @@ func (cr *ControlRequest) Auto(cool, heat int) *ControlRequest {
 
 type SettingsRequest struct {
 	TempUnits          *int `json:"tempunits,omitempty"`
-	Away               *int `json:"away,omitempty"`
+	IsAway             *int `json:"away,omitempty"`
 	Schedule           *int `json:"schedule,omitempty"`
 	HumidifySetPoint   *int `json:"hum_setpoint,omitempty"`
 	DehumidifySetPoint *int `json:"dehum_setpoint,omitempty"`
@@ -139,18 +143,18 @@ func (sr *SettingsRequest) Celsius() *SettingsRequest {
 }
 
 func (sr *SettingsRequest) SetAway(away bool) *SettingsRequest {
-	sr.Away = new(int)
+	sr.IsAway = new(int)
 	if away {
-		*sr.Away = 1
+		*sr.IsAway = 1
 	} else {
-		*sr.Away = 0
+		*sr.IsAway = 0
 	}
 	return sr
 }
 
-// func (sr *SettingsRequest) Away() *SettingsRequest {
-// 	return sr.SetAway(true)
-// }
+func (sr *SettingsRequest) Away() *SettingsRequest {
+	return sr.SetAway(true)
+}
 
 func (sr *SettingsRequest) Home() *SettingsRequest {
 	return sr.SetAway(false)

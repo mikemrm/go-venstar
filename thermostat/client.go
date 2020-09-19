@@ -16,6 +16,7 @@ import (
 
 var (
 	defaultTimeout = 5 * time.Second
+	userAgent      = "github.com/mikemrm/go-venstar:0.1"
 )
 
 type Thermostat struct {
@@ -43,7 +44,7 @@ func (t *Thermostat) GetAPIInfo() (*APIInfo, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "creating api info request")
 	}
-	req.Header.Add("User-Agent", "github.com/mikemrm/go-venstar:0.1")
+	req.Header.Add("User-Agent", userAgent)
 	resp, err := t.client.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "sending api info request")
@@ -61,7 +62,7 @@ func (t *Thermostat) GetQueryInfo() (*QueryInfo, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "creating query info request")
 	}
-	req.Header.Add("User-Agent", "github.com/mikemrm/go-venstar:0.1")
+	req.Header.Add("User-Agent", userAgent)
 	resp, err := t.client.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "sending query info request")
@@ -72,6 +73,60 @@ func (t *Thermostat) GetQueryInfo() (*QueryInfo, error) {
 		return nil, errors.Wrap(err, "decoding query info response")
 	}
 	return &info, nil
+}
+
+func (t *Thermostat) GetQuerySensors() ([]*Sensor, error) {
+	req, err := http.NewRequest("GET", t.url("/query/sensors"), nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating query sensors request")
+	}
+	req.Header.Add("User-Agent", userAgent)
+	resp, err := t.client.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "sending query sensors request")
+	}
+	var info QueryResponse
+	err = DecodeBody(resp, &info)
+	if err != nil {
+		return nil, errors.Wrap(err, "decoding query sensors response")
+	}
+	return info.Sensors, nil
+}
+
+func (t *Thermostat) GetQueryRuntimes() ([]*Runtime, error) {
+	req, err := http.NewRequest("GET", t.url("/query/runtimes"), nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating query runtime request")
+	}
+	req.Header.Add("User-Agent", userAgent)
+	resp, err := t.client.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "sending query runtime request")
+	}
+	var info QueryResponse
+	err = DecodeBody(resp, &info)
+	if err != nil {
+		return nil, errors.Wrap(err, "decoding query runtime response")
+	}
+	return info.Runtimes, nil
+}
+
+func (t *Thermostat) GetQueryAlerts() ([]*Alert, error) {
+	req, err := http.NewRequest("GET", t.url("/query/alerts"), nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating query alerts request")
+	}
+	req.Header.Add("User-Agent", userAgent)
+	resp, err := t.client.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "sending query alerts request")
+	}
+	var info QueryResponse
+	err = DecodeBody(resp, &info)
+	if err != nil {
+		return nil, errors.Wrap(err, "decoding query alerts response")
+	}
+	return info.Alerts, nil
 }
 
 func DecodeBody(resp *http.Response, out interface{}) error {
