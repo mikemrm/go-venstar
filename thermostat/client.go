@@ -39,7 +39,7 @@ func (t *Thermostat) url(parts ...interface{}) string {
 	return nurl.String()
 }
 
-func (t *Thermostat) request(method, path string, body interface{}) (*http.Request, error) {
+func (t *Thermostat) buildRequest(method, path string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(method, path, body)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (t *Thermostat) request(method, path string, body interface{}) (*http.Reque
 }
 
 func (t *Thermostat) getJSON(path string, data interface{}) (*http.Response, error) {
-	req, err := t.request("GET", path, nil)
+	req, err := t.buildRequest("GET", path, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "building "+path+" request")
 	}
