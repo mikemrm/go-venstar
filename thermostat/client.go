@@ -19,8 +19,12 @@ var (
 	userAgent      = "github.com/mikemrm/go-venstar:0.1"
 )
 
+type thermostatClient interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
 type Thermostat struct {
-	client  *http.Client
+	client  thermostatClient
 	baseURL url.URL
 	pin     string
 }
@@ -65,7 +69,6 @@ func (t *Thermostat) getJSON(path string, data interface{}) (*http.Response, err
 }
 
 func (t *Thermostat) GetAPIInfo() (*APIInfo, error) {
-
 	var info APIInfo
 	_, err := t.getJSON(t.url("/"), &info)
 	if err != nil {
