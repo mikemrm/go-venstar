@@ -22,10 +22,10 @@ var (
 type Thermostat struct {
 	client  *http.Client
 	baseURL url.URL
-	pin     int
+	pin     string
 }
 
-func (t *Thermostat) SetPin(pin int) {
+func (t *Thermostat) SetPin(pin string) {
 	t.pin = pin
 }
 
