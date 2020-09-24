@@ -1,4 +1,2 @@
-github.com/mikemrm/go-venstar/thermostat v0.0.0-20200919162401-65bf2174e714 h1:nVO1Ij4XsNoMNQgDjTPbl/lk/tWF93lgLcx07TktGlQ=
-github.com/mikemrm/go-venstar/thermostat v0.0.0-20200919162401-65bf2174e714/go.mod h1:vaHlGItS0r/ZNPcclOZA4fC/NnG1E8p9G9Vh+1Y0RrI=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
