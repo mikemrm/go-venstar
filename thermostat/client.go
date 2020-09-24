@@ -19,13 +19,17 @@ var (
 	userAgent      = "github.com/mikemrm/go-venstar:0.1"
 )
 
-type Thermostat struct {
-	client  *http.Client
-	baseURL url.URL
-	pin     int
+type thermostatClient interface {
+	Do(*http.Request) (*http.Response, error)
 }
 
-func (t *Thermostat) SetPin(pin int) {
+type Thermostat struct {
+	client  thermostatClient
+	baseURL url.URL
+	pin     string
+}
+
+func (t *Thermostat) SetPin(pin string) {
 	t.pin = pin
 }
 
@@ -39,92 +43,72 @@ func (t *Thermostat) url(parts ...interface{}) string {
 	return nurl.String()
 }
 
-func (t *Thermostat) GetAPIInfo() (*APIInfo, error) {
-	req, err := http.NewRequest("GET", t.url("/"), nil)
+func (t *Thermostat) buildRequest(method, path string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequest(method, path, body)
 	if err != nil {
-		return nil, errors.Wrap(err, "creating api info request")
+		return nil, err
 	}
 	req.Header.Add("User-Agent", userAgent)
+	return req, err
+}
+
+func (t *Thermostat) getJSON(path string, data interface{}) (*http.Response, error) {
+	req, err := t.buildRequest("GET", path, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "building "+path+" request")
+	}
 	resp, err := t.client.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "sending api info request")
+		return resp, errors.Wrap(err, "requesting "+path)
 	}
-	var info APIInfo
-	err = DecodeBody(resp, &info)
+	err = DecodeBody(resp, data)
 	if err != nil {
-		return nil, errors.Wrap(err, "decoding api info response")
+		return resp, errors.Wrap(err, "decoding "+path+" response")
+	}
+	return resp, nil
+}
+
+func (t *Thermostat) GetAPIInfo() (*APIInfo, error) {
+	var info APIInfo
+	_, err := t.getJSON(t.url("/"), &info)
+	if err != nil {
+		return nil, errors.Wrap(err, "processing api info request")
 	}
 	return &info, nil
 }
 
 func (t *Thermostat) GetQueryInfo() (*QueryInfo, error) {
-	req, err := http.NewRequest("GET", t.url("/query/info"), nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating query info request")
-	}
-	req.Header.Add("User-Agent", userAgent)
-	resp, err := t.client.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "sending query info request")
-	}
 	var info QueryInfo
-	err = DecodeBody(resp, &info)
+	_, err := t.getJSON(t.url("/query/info"), &info)
 	if err != nil {
-		return nil, errors.Wrap(err, "decoding query info response")
+		return nil, errors.Wrap(err, "processing query info request")
 	}
 	return &info, nil
 }
 
 func (t *Thermostat) GetQuerySensors() ([]*Sensor, error) {
-	req, err := http.NewRequest("GET", t.url("/query/sensors"), nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating query sensors request")
-	}
-	req.Header.Add("User-Agent", userAgent)
-	resp, err := t.client.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "sending query sensors request")
-	}
 	var info QueryResponse
-	err = DecodeBody(resp, &info)
+	_, err := t.getJSON(t.url("/query/sensors"), &info)
 	if err != nil {
-		return nil, errors.Wrap(err, "decoding query sensors response")
+		return nil, errors.Wrap(err, "processing query sensors request")
 	}
 	return info.Sensors, nil
 }
 
 func (t *Thermostat) GetQueryRuntimes() ([]*Runtime, error) {
-	req, err := http.NewRequest("GET", t.url("/query/runtimes"), nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating query runtime request")
-	}
-	req.Header.Add("User-Agent", userAgent)
-	resp, err := t.client.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "sending query runtime request")
-	}
 	var info QueryResponse
-	err = DecodeBody(resp, &info)
+	_, err := t.getJSON(t.url("/query/runtimes"), &info)
 	if err != nil {
-		return nil, errors.Wrap(err, "decoding query runtime response")
+		return nil, errors.Wrap(err, "processing query runtime request")
 	}
 	return info.Runtimes, nil
 }
 
 func (t *Thermostat) GetQueryAlerts() ([]*Alert, error) {
-	req, err := http.NewRequest("GET", t.url("/query/alerts"), nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating query alerts request")
-	}
-	req.Header.Add("User-Agent", userAgent)
-	resp, err := t.client.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "sending query alerts request")
-	}
 	var info QueryResponse
-	err = DecodeBody(resp, &info)
+	_, err := t.getJSON(t.url("/query/alerts"), &info)
 	if err != nil {
-		return nil, errors.Wrap(err, "decoding query alerts response")
+		return nil, errors.Wrap(err, "processing query alerts request")
 	}
 	return info.Alerts, nil
 }
