@@ -1,5 +1,13 @@
 package thermostat
 
+import (
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
+)
+
 type SettingsRequest struct {
 	TempUnits          *int `json:"tempunits,omitempty"`
 	IsAway             *int `json:"away,omitempty"`
@@ -46,6 +54,14 @@ func (sr *SettingsRequest) SetSchedule(value int) *SettingsRequest {
 	return sr
 }
 
+func (sr *SettingsRequest) ScheduleOff() *SettingsRequest {
+	return sr.SetSchedule(0)
+}
+
+func (sr *SettingsRequest) ScheduleOn() *SettingsRequest {
+	return sr.SetSchedule(1)
+}
+
 func (sr *SettingsRequest) SetHumidifySetPoint(value int) *SettingsRequest {
 	sr.HumidifySetPoint = new(int)
 	*sr.HumidifySetPoint = value
@@ -56,4 +72,32 @@ func (sr *SettingsRequest) SetDehumidifySetPoint(value int) *SettingsRequest {
 	sr.DehumidifySetPoint = new(int)
 	*sr.DehumidifySetPoint = value
 	return sr
+}
+
+func (sr *SettingsRequest) BuildRequest(req *http.Request) error {
+	params := make(url.Values)
+	if sr.TempUnits != nil {
+		params.Set("tempunits", strconv.Itoa(*sr.TempUnits))
+	}
+	if sr.IsAway != nil {
+		params.Set("away", strconv.Itoa(*sr.IsAway))
+	}
+	if sr.Schedule != nil {
+		params.Set("schedule", strconv.Itoa(*sr.Schedule))
+	}
+	if sr.HumidifySetPoint != nil {
+		params.Set("hum_setpoint", strconv.Itoa(*sr.HumidifySetPoint))
+	}
+	if sr.DehumidifySetPoint != nil {
+		params.Set("dehum_setpoint", strconv.Itoa(*sr.DehumidifySetPoint))
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	body := params.Encode()
+	req.Body = ioutil.NopCloser(strings.NewReader(body))
+	req.ContentLength = int64(len(body))
+	return nil
+}
+
+func NewSettingsRequest() *SettingsRequest {
+	return &SettingsRequest{}
 }

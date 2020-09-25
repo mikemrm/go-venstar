@@ -152,6 +152,21 @@ func (t *Thermostat) UpdateControls(cr *ControlRequest) error {
 	return nil
 }
 
+func (t *Thermostat) UpdateSettings(sr *SettingsRequest) error {
+	var updateResponse UpdateResponse
+	_, err := t.postJSON(t.url("/settings"), sr, &updateResponse)
+	if err != nil {
+		return errors.Wrap(err, "processing update settings request")
+	}
+	if updateResponse.Error {
+		return errors.New("Settings Request update error: " + updateResponse.Reason)
+	}
+	if !updateResponse.Success {
+		return errors.New("Settings Request unknown error")
+	}
+	return nil
+}
+
 func DecodeBody(resp *http.Response, out interface{}) error {
 	if resp.Body != nil {
 		defer resp.Body.Close()
