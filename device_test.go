@@ -2,7 +2,29 @@ package venstar
 
 import (
 	"testing"
+
+	"github.com/mikemrm/go-venstar/thermostat"
 )
+
+func TestDeviceThermostat(t *testing.T) {
+	t.Run("initiates new thermostat", func(t *testing.T) {
+		device := &Device{Address: "127.0.0.1"}
+		device.Thermostat()
+		if device.thermostat == nil {
+			t.Error("thermostat reference not updated")
+		}
+	})
+	t.Run("reuses reference", func(t *testing.T) {
+		device := &Device{Address: "127.0.0.1"}
+		tstat := thermostat.New("127.0.0.2")
+		device.thermostat = tstat
+
+		rtstat := device.Thermostat()
+		if rtstat != tstat {
+			t.Error("thermostat reference not reused")
+		}
+	})
+}
 
 func TestNewDevice(t *testing.T) {
 	tests := []struct {
