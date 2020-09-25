@@ -1,6 +1,47 @@
 # Venstar Go library
 
-## Example Output
+Venstar is a Thermostat manufacturer which provides a snappy http API that can
+be used to interact and retreive stats about your thermostat.
+
+go-venstar aims to provide a clean library for interacting with this api
+through Go.
+
+*Note:* This library has only been tested on the _ColorTouch T8900_ however it
+should work on all Venstar thermostats which support the Local API and follows
+the restful docs.
+
+## venstar-tstat
+
+`venstar-tstat`s requires the ip of the thermostat to be provided.
+
+The default action of venstar-tstat is to print all information available over
+the venstar api.
+
+If you pass any additional arguments, the command will process the updates,
+followed by printing all information available over the api.
+
+```shell
+$ venstar-tstat -help
+Usage of venstar-tstat:
+  -controls.cool int
+      Update Cool to temp (default -1)
+  -controls.fan string
+      Update Fan auto/on
+  -controls.heat int
+      Update Heat to temp (default -1)
+  -controls.mode string
+      Update Mode off/heat/cool/auto
+  -settings.away string
+      Update Away yes/no
+  -settings.dehumidify-setpoint int
+      Update Dehumidify SetPoint (25-99) (default -1)
+  -settings.humidify-setpoint int
+      Update Humidify SetPoint (0-60) (default -1)
+  -settings.schedule string
+      Update Schedule off/on
+  -settings.tempunits string
+      Update temperature units f/c fahrenheit/celsius
+```
 
 ```shell
 $ venstar-tstat 192.168.1.105
@@ -55,4 +96,20 @@ Query Alerts:
   Air Filter: Active = false
      UV Lamp: Active = false
      Service: Active = false
+```
+
+```shell
+$ venstar-tstat/main.go -controls.mode auto -controls.heat 72 -controls.cool 76 192.168.1.105
+Controls updated!
+API Info:
+  Type     : commercial
+  Model    : COLORTOUCH
+  Version  : 7
+  Firmware : 5.10
+Query Info:
+...
+  SpaceTemp          : 76.0
+  HeatTemp           : 72.0
+  CoolTemp           : 76.0
+...
 ```
