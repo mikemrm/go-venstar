@@ -145,6 +145,59 @@ func TestGetJSON(t *testing.T) {
 	}
 }
 
+type fakeUpdate struct {
+	error bool
+}
+
+func (fu *fakeUpdate) BuildRequest(_ *http.Request) error {
+	if fu.error {
+		return errors.New("this is an error")
+	}
+	return nil
+}
+
+func TestPostJSON(t *testing.T) {
+	tests := []struct {
+		name      string
+		url       string
+		reqBody   string
+		expBody   string
+		updateErr bool
+		expErr    string
+	}{
+		{"invalid request returns error", "://bad", "", "", false, `building ://bad request: parse "://bad": missing protocol scheme`},
+		{"invalid update returns error", "req/path", "", "", true, `building req/path update request: this is an error`},
+		{"bad response returns error", "req/path", "", "", false, `requesting req/path: this is an error`},
+		{"invalid json returns error", "req/path", `invalid"`, "", false, `decoding req/path response: decoding json: invalid character 'i' looking for beginning of value`},
+		{"valid json gets decoded", "req/path", `"valid"`, "valid", false, ""},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			tstatClient := &fakeThermostatClient{
+				body: test.reqBody,
+			}
+			if test.reqBody == "" && test.expErr != "" {
+				tstatClient.error = true
+			}
+			tstat := &Thermostat{
+				client: tstatClient,
+			}
+
+			update := &fakeUpdate{test.updateErr}
+
+			var out string
+			_, err := tstat.postJSON(test.url, update, &out)
+
+			if test.expErr != "" && err == nil {
+				t.Fatal("error", test.expErr, "wanted, got nil")
+			}
+			if test.expErr != "" && err != nil && test.expErr != err.Error() {
+				t.Fatal("error expected, got:", err.Error(), "want:", test.expErr)
+			}
+		})
+	}
+}
+
 func TestNew(t *testing.T) {
 	tstat := New("127.0.0.1")
 	t.Run("empty on creation", func(t *testing.T) {

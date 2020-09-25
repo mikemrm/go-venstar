@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"sort"
@@ -9,9 +10,77 @@ import (
 	"github.com/mikemrm/go-venstar/thermostat"
 )
 
-func main() {
-	t := thermostat.New(os.Args[1])
+var (
+	controlMode string
+	controlFan  string
+	controlHeat int
+	controlCool int
+)
 
+func init() {
+	flag.StringVar(&controlMode, "controls.mode", "", "Update Mode off/heat/cool/auto")
+	flag.StringVar(&controlFan, "controls.fan", "", "Update Fan auto/on")
+	flag.IntVar(&controlHeat, "controls.heat", -1, "Update Heat to temp")
+	flag.IntVar(&controlCool, "controls.cool", -1, "Update Cool to temp")
+}
+
+func main() {
+	flag.Parse()
+	ip := flag.Arg(0)
+	if ip == "" {
+		fmt.Fprintln(os.Stderr, "Thermostat IP required")
+		os.Exit(1)
+	}
+	t := thermostat.New(ip)
+
+	processUpdates(t)
+	printInfo(t)
+}
+
+func processUpdates(t *thermostat.Thermostat) {
+	if controlMode != "" || controlFan != "" || controlHeat != -1 || controlCool != -1 {
+		update := thermostat.NewControlRequest()
+		switch controlMode {
+		case "off":
+			update.SetMode(0)
+		case "heat":
+			update.SetMode(1)
+		case "cool":
+			update.SetMode(2)
+		case "auto":
+			update.SetMode(3)
+		case "":
+			break
+		default:
+			fmt.Fprintf(os.Stderr, "Invalid mode '%s'\n", controlMode)
+			os.Exit(1)
+		}
+		switch controlFan {
+		case "auto":
+			update.SetFan(0)
+		case "on":
+			update.SetFan(1)
+		case "":
+			break
+		default:
+			fmt.Fprintf(os.Stderr, "Invalid fan mode '%s'\n", controlFan)
+			os.Exit(1)
+		}
+		if controlHeat != -1 {
+			update.SetHeatTemp(controlHeat)
+		}
+		if controlCool != -1 {
+			update.SetCoolTemp(controlCool)
+		}
+		err := t.UpdateControls(update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Controls updated!")
+	}
+}
+
+func printInfo(t *thermostat.Thermostat) {
 	fmt.Println("API Info:")
 	info, err := t.GetAPIInfo()
 	if err != nil {
