@@ -6,22 +6,26 @@ import (
 	"time"
 )
 
+// QueryResponse encompasses the results for sensor, runtime and alert results.
 type QueryResponse struct {
 	Sensors  []*Sensor  `json:"sensors,omitempty"`
 	Runtimes []*Runtime `json:"runtimes,omitempty"`
 	Alerts   []*Alert   `json:"alerts,omitempty"`
 }
 
+// Sensor represents the thermostat sensor readings
 type Sensor struct {
 	Name string  `json:"name"`
 	Temp float64 `json:"temp"`
 }
 
+// Alert represents the thermostat alert values
 type Alert struct {
 	Name   string `json:"name"`
 	Active bool   `json:"active"`
 }
 
+// Runtime represents the thermostat runtime results
 type Runtime struct {
 	Timestamp   time.Time
 	Heaters     map[string]time.Duration

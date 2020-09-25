@@ -27,12 +27,14 @@ type updateObject interface {
 	BuildRequest(*http.Request) error
 }
 
+// Thermostat manages communication with Venstar API.
 type Thermostat struct {
 	client  thermostatClient
 	baseURL url.URL
 	pin     string
 }
 
+// SetPin sets the unlock pin when device has a pin set.
 func (t *Thermostat) SetPin(pin string) {
 	t.pin = pin
 }
@@ -92,6 +94,7 @@ func (t *Thermostat) postJSON(path string, update updateObject, data interface{}
 	return resp, nil
 }
 
+// GetAPIInfo retreives the general API information from the thermostat.
 func (t *Thermostat) GetAPIInfo() (*APIInfo, error) {
 	var info APIInfo
 	_, err := t.getJSON(t.url("/"), &info)
@@ -101,6 +104,7 @@ func (t *Thermostat) GetAPIInfo() (*APIInfo, error) {
 	return &info, nil
 }
 
+// GetQueryInfo retreives overall stats from the thermostat.
 func (t *Thermostat) GetQueryInfo() (*QueryInfo, error) {
 	var info QueryInfo
 	_, err := t.getJSON(t.url("/query/info"), &info)
@@ -110,6 +114,7 @@ func (t *Thermostat) GetQueryInfo() (*QueryInfo, error) {
 	return &info, nil
 }
 
+// GetQuerySensors retreives the sensor readings from the thermostat.
 func (t *Thermostat) GetQuerySensors() ([]*Sensor, error) {
 	var info QueryResponse
 	_, err := t.getJSON(t.url("/query/sensors"), &info)
@@ -119,6 +124,8 @@ func (t *Thermostat) GetQuerySensors() ([]*Sensor, error) {
 	return info.Sensors, nil
 }
 
+// GetQueryRuntimes retreives the active system duration for each day.
+// The results for each timestamp is for 24 hours prior.
 func (t *Thermostat) GetQueryRuntimes() ([]*Runtime, error) {
 	var info QueryResponse
 	_, err := t.getJSON(t.url("/query/runtimes"), &info)
@@ -128,6 +135,8 @@ func (t *Thermostat) GetQueryRuntimes() ([]*Runtime, error) {
 	return info.Runtimes, nil
 }
 
+// GetQueryAlerts retreives a list of alerts and whether they are triggered
+// or not.
 func (t *Thermostat) GetQueryAlerts() ([]*Alert, error) {
 	var info QueryResponse
 	_, err := t.getJSON(t.url("/query/alerts"), &info)
@@ -137,6 +146,8 @@ func (t *Thermostat) GetQueryAlerts() ([]*Alert, error) {
 	return info.Alerts, nil
 }
 
+// UpdateControls submits the provided update request returning an error if the
+// update failed.
 func (t *Thermostat) UpdateControls(cr *ControlRequest) error {
 	var updateResponse UpdateResponse
 	_, err := t.postJSON(t.url("/control"), cr, &updateResponse)
@@ -152,6 +163,8 @@ func (t *Thermostat) UpdateControls(cr *ControlRequest) error {
 	return nil
 }
 
+// UpdateSettings submits the provided update request returning an error if the
+// update failed.
 func (t *Thermostat) UpdateSettings(sr *SettingsRequest) error {
 	var updateResponse UpdateResponse
 	_, err := t.postJSON(t.url("/settings"), sr, &updateResponse)
@@ -167,6 +180,7 @@ func (t *Thermostat) UpdateSettings(sr *SettingsRequest) error {
 	return nil
 }
 
+// DecodeBody decodes the json http response body into the provided interface.
 func DecodeBody(resp *http.Response, out interface{}) error {
 	if resp.Body != nil {
 		defer resp.Body.Close()
@@ -182,6 +196,7 @@ func DecodeBody(resp *http.Response, out interface{}) error {
 	return nil
 }
 
+// New creates a new Thermostat instance
 func New(host string) *Thermostat {
 	client := &http.Client{
 		Timeout: defaultTimeout,
