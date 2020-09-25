@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// QueryInfo is the struct returned for `/query/info` requests.
 type QueryInfo struct {
 	Name               string            `json:"name"`
 	Mode               Mode              `json:"mode"`
@@ -34,8 +35,10 @@ type QueryInfo struct {
 	AvailableModes     AvailableModes    `json:"availablemodes"`
 }
 
+// Mode allows for a string representation of the value to be returned.
 type Mode int
 
+// String returns a string representation of the value.
 func (m Mode) String() string {
 	switch m {
 	case 0:
@@ -50,8 +53,10 @@ func (m Mode) String() string {
 	return ""
 }
 
+// State allows for a string representation of the value to be returned.
 type State int
 
+// String returns a string representation of the value.
 func (s State) String() string {
 	switch s {
 	case 0:
@@ -68,8 +73,10 @@ func (s State) String() string {
 	return ""
 }
 
+// Fan allows for a string representation of the value to be returned.
 type Fan int
 
+// String returns a string representation of the value.
 func (f Fan) String() string {
 	switch f {
 	case 0:
@@ -80,8 +87,10 @@ func (f Fan) String() string {
 	return ""
 }
 
+// FanState allows for a string representation of the value to be returned.
 type FanState int
 
+// String returns a string representation of the value.
 func (f FanState) String() string {
 	switch f {
 	case 0:
@@ -92,8 +101,10 @@ func (f FanState) String() string {
 	return ""
 }
 
+// TempUnits allows for a string representation of the value to be returned.
 type TempUnits int
 
+// String returns a string representation of the value.
 func (f TempUnits) String() string {
 	switch f {
 	case 0:
@@ -104,8 +115,10 @@ func (f TempUnits) String() string {
 	return ""
 }
 
+// Schedule allows for a string representation of the value to be returned.
 type Schedule int
 
+// String returns a string representation of the value.
 func (f Schedule) String() string {
 	switch f {
 	case 0:
@@ -116,8 +129,10 @@ func (f Schedule) String() string {
 	return ""
 }
 
+// SchedulePart allows for a string representation of the value to be returned.
 type SchedulePart int
 
+// String returns a string representation of the value.
 func (f SchedulePart) String() string {
 	switch f {
 	case 0:
@@ -134,8 +149,10 @@ func (f SchedulePart) String() string {
 	return ""
 }
 
+// Away allows for a string representation of the value to be returned.
 type Away int
 
+// String returns a string representation of the value.
 func (f Away) String() string {
 	switch f {
 	case 0:
@@ -146,8 +163,10 @@ func (f Away) String() string {
 	return ""
 }
 
+// Holiday allows for a string representation of the value to be returned.
 type Holiday int
 
+// String returns a string representation of the value.
 func (f Holiday) String() string {
 	switch f {
 	case 0:
@@ -158,8 +177,10 @@ func (f Holiday) String() string {
 	return ""
 }
 
+// Override allows for a string representation of the value to be returned.
 type Override int
 
+// String returns a string representation of the value.
 func (f Override) String() string {
 	switch f {
 	case 0:
@@ -170,14 +191,20 @@ func (f Override) String() string {
 	return ""
 }
 
+// OverrideRemaining allows for a string representation of the value to be
+// returned.
 type OverrideRemaining int
 
+// String returns a string representation of the value.
 func (f OverrideRemaining) String() string {
 	return (time.Duration(f) * time.Minute).String()
 }
 
+// ForceUnoccupied allows for a string representation of the value to be
+// returned.
 type ForceUnoccupied int
 
+// String returns a string representation of the value.
 func (f ForceUnoccupied) String() string {
 	switch f {
 	case 0:
@@ -188,8 +215,11 @@ func (f ForceUnoccupied) String() string {
 	return ""
 }
 
+// HumidityEnabled allows for a string representation of the value to be
+// returned.
 type HumidityEnabled int
 
+// String returns a string representation of the value.
 func (f HumidityEnabled) String() string {
 	switch f {
 	case 0:
@@ -200,8 +230,11 @@ func (f HumidityEnabled) String() string {
 	return ""
 }
 
+// AvailableModes allows for a string representation of the value to be
+// returned.
 type AvailableModes int
 
+// String returns a string representation of the value.
 func (f AvailableModes) String() string {
 	switch f {
 	case 0:
