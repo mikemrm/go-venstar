@@ -7,7 +7,8 @@ type APIInfo struct {
 	Type     string `json:"type"`
 }
 
-type ErrorResponse struct {
-	Error  bool   `json:"error"`
-	Reason string `json:"reason,omitempty"`
+type UpdateResponse struct {
+	Success bool   `json:"success,omitempty"`
+	Error   bool   `json:"error"`
+	Reason  string `json:"reason,omitempty"`
 }

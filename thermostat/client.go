@@ -23,6 +23,10 @@ type thermostatClient interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
+type updateObject interface {
+	BuildRequest(*http.Request) error
+}
+
 type Thermostat struct {
 	client  thermostatClient
 	baseURL url.URL
@@ -56,6 +60,26 @@ func (t *Thermostat) getJSON(path string, data interface{}) (*http.Response, err
 	req, err := t.buildRequest("GET", path, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "building "+path+" request")
+	}
+	resp, err := t.client.Do(req)
+	if err != nil {
+		return resp, errors.Wrap(err, "requesting "+path)
+	}
+	err = DecodeBody(resp, data)
+	if err != nil {
+		return resp, errors.Wrap(err, "decoding "+path+" response")
+	}
+	return resp, nil
+}
+
+func (t *Thermostat) postJSON(path string, update updateObject, data interface{}) (*http.Response, error) {
+	req, err := t.buildRequest("POST", path, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "building "+path+" request")
+	}
+	err = update.BuildRequest(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "building "+path+" update request")
 	}
 	resp, err := t.client.Do(req)
 	if err != nil {
@@ -111,6 +135,36 @@ func (t *Thermostat) GetQueryAlerts() ([]*Alert, error) {
 		return nil, errors.Wrap(err, "processing query alerts request")
 	}
 	return info.Alerts, nil
+}
+
+func (t *Thermostat) UpdateControls(cr *ControlRequest) error {
+	var updateResponse UpdateResponse
+	_, err := t.postJSON(t.url("/control"), cr, &updateResponse)
+	if err != nil {
+		return errors.Wrap(err, "processing update control request")
+	}
+	if updateResponse.Error {
+		return errors.New("Control Request update error: " + updateResponse.Reason)
+	}
+	if !updateResponse.Success {
+		return errors.New("Control Request unknown error")
+	}
+	return nil
+}
+
+func (t *Thermostat) UpdateSettings(sr *SettingsRequest) error {
+	var updateResponse UpdateResponse
+	_, err := t.postJSON(t.url("/settings"), sr, &updateResponse)
+	if err != nil {
+		return errors.Wrap(err, "processing update settings request")
+	}
+	if updateResponse.Error {
+		return errors.New("Settings Request update error: " + updateResponse.Reason)
+	}
+	if !updateResponse.Success {
+		return errors.New("Settings Request unknown error")
+	}
+	return nil
 }
 
 func DecodeBody(resp *http.Response, out interface{}) error {

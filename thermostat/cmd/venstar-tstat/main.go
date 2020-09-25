@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"sort"
@@ -9,9 +10,135 @@ import (
 	"github.com/mikemrm/go-venstar/thermostat"
 )
 
-func main() {
-	t := thermostat.New(os.Args[1])
+var (
+	controlMode string
+	controlFan  string
+	controlHeat int
+	controlCool int
 
+	settingTempUnits          string
+	settingAway               string
+	settingSchedule           string
+	settingHumidifySetPoint   int
+	settingDehumidifySetPoint int
+)
+
+func init() {
+	flag.StringVar(&controlMode, "controls.mode", "", "Update Mode off/heat/cool/auto")
+	flag.StringVar(&controlFan, "controls.fan", "", "Update Fan auto/on")
+	flag.IntVar(&controlHeat, "controls.heat", -1, "Update Heat to temp")
+	flag.IntVar(&controlCool, "controls.cool", -1, "Update Cool to temp")
+	flag.StringVar(&settingTempUnits, "settings.tempunits", "", "Update temperature units f/c fahrenheit/celsius")
+	flag.StringVar(&settingAway, "settings.away", "", "Update Away yes/no")
+	flag.StringVar(&settingSchedule, "settings.schedule", "", "Update Schedule off/on")
+	flag.IntVar(&settingHumidifySetPoint, "settings.humidify-setpoint", -1, "Update Humidify SetPoint (0-60)")
+	flag.IntVar(&settingDehumidifySetPoint, "settings.dehumidify-setpoint", -1, "Update Dehumidify SetPoint (25-99)")
+}
+
+func main() {
+	flag.Parse()
+	ip := flag.Arg(0)
+	if ip == "" {
+		fmt.Fprintln(os.Stderr, "Thermostat IP required")
+		os.Exit(1)
+	}
+	t := thermostat.New(ip)
+
+	processUpdates(t)
+	printInfo(t)
+}
+
+func processUpdates(t *thermostat.Thermostat) {
+	if controlMode != "" || controlFan != "" || controlHeat != -1 || controlCool != -1 {
+		update := thermostat.NewControlRequest()
+		switch controlMode {
+		case "off":
+			update.SetMode(0)
+		case "heat":
+			update.SetMode(1)
+		case "cool":
+			update.SetMode(2)
+		case "auto":
+			update.SetMode(3)
+		case "":
+			break
+		default:
+			fmt.Fprintf(os.Stderr, "Invalid mode '%s'\n", controlMode)
+			os.Exit(1)
+		}
+		switch controlFan {
+		case "auto":
+			update.SetFan(0)
+		case "on":
+			update.SetFan(1)
+		case "":
+			break
+		default:
+			fmt.Fprintf(os.Stderr, "Invalid fan mode '%s'\n", controlFan)
+			os.Exit(1)
+		}
+		if controlHeat != -1 {
+			update.SetHeatTemp(controlHeat)
+		}
+		if controlCool != -1 {
+			update.SetCoolTemp(controlCool)
+		}
+		err := t.UpdateControls(update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Controls updated!")
+	}
+	if settingTempUnits != "" || settingAway != "" || settingSchedule != "" || settingHumidifySetPoint != -1 || settingDehumidifySetPoint != -1 {
+		update := thermostat.NewSettingsRequest()
+		switch settingTempUnits {
+		case "f", "fahrenheit":
+			update.Fahrenheit()
+		case "c", "celsius":
+			update.Celsius()
+		case "":
+			break
+		default:
+			fmt.Fprintf(os.Stderr, "Invalid temperature unit '%s'\n", settingTempUnits)
+			os.Exit(1)
+		}
+		switch settingAway {
+		case "y", "yes":
+			update.Away()
+		case "n", "no":
+			update.Home()
+		case "":
+			break
+		default:
+			fmt.Fprintf(os.Stderr, "Invalid away setting '%s'\n", settingAway)
+			os.Exit(1)
+		}
+		switch settingSchedule {
+		case "off":
+			update.ScheduleOff()
+		case "on":
+			update.ScheduleOn()
+		case "":
+			break
+		default:
+			fmt.Fprintf(os.Stderr, "Invalid schedule setting '%s'\n", settingAway)
+			os.Exit(1)
+		}
+		if settingHumidifySetPoint != -1 {
+			update.SetHumidifySetPoint(settingHumidifySetPoint)
+		}
+		if settingDehumidifySetPoint != -1 {
+			update.SetDehumidifySetPoint(settingDehumidifySetPoint)
+		}
+		err := t.UpdateSettings(update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Settings updated!")
+	}
+}
+
+func printInfo(t *thermostat.Thermostat) {
 	fmt.Println("API Info:")
 	info, err := t.GetAPIInfo()
 	if err != nil {
