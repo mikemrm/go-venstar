@@ -1,3 +1,7 @@
+[![GoDev](https://img.shields.io/static/v1?label=godev&message=reference&color=00add8)](https://pkg.go.dev/github.com/mikemrm/go-venstar)
+[![BuildStatus](https://github.com/mikemrm/go-venstar/workflows/Test/badge.svg)](https://github.com/mikemrm/go-venstar/actions?workflow=Test)
+[![codecov](https://codecov.io/gh/mikemrm/go-venstar/branch/master/graph/badge.svg)](https://codecov.io/gh/mikemrm/go-venstar)
+
 # Venstar Go library
 
 Venstar is a Thermostat manufacturer which provides a snappy http API that can
