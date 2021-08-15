@@ -42,7 +42,7 @@ func TestBuildRequest(t *testing.T) {
 		})
 	}
 
-	wantUserAgent := "github.com/mikemrm/go-venstar:0.1"
+	wantUserAgent := "go.mrm.dev/venstar:0.1"
 	for _, method := range testMethods {
 		t.Run(method+" User-Agent header is set", func(t *testing.T) {
 			req, err := tstat.buildRequest(method, "http://localhost", nil)

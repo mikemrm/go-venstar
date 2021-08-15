@@ -3,7 +3,7 @@ package venstar
 import (
 	"testing"
 
-	"github.com/mikemrm/go-venstar/thermostat"
+	"go.mrm.dev/venstar/thermostat"
 )
 
 func TestDeviceThermostat(t *testing.T) {
