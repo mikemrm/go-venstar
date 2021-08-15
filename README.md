@@ -1,4 +1,4 @@
-[![GoDev](https://img.shields.io/static/v1?label=godev&message=reference&color=00add8)](https://pkg.go.dev/github.com/mikemrm/go-venstar)
+[![GoDev](https://img.shields.io/static/v1?label=godev&message=reference&color=00add8)](https://pkg.go.dev/go.mrm.dev/venstar)
 [![BuildStatus](https://github.com/mikemrm/go-venstar/workflows/Test/badge.svg)](https://github.com/mikemrm/go-venstar/actions?workflow=Test)
 [![codecov](https://codecov.io/gh/mikemrm/go-venstar/branch/main/graph/badge.svg)](https://codecov.io/gh/mikemrm/go-venstar)
 

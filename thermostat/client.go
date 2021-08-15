@@ -16,7 +16,7 @@ import (
 
 var (
 	defaultTimeout = 5 * time.Second
-	userAgent      = "github.com/mikemrm/go-venstar:0.1"
+	userAgent      = "go.mrm.dev/venstar:0.1"
 )
 
 type thermostatClient interface {

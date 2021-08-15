@@ -1,4 +1,4 @@
-module github.com/mikemrm/go-venstar
+module go.mrm.dev/venstar
 
 go 1.14
 

@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/mikemrm/go-venstar/thermostat"
+	"go.mrm.dev/venstar/thermostat"
 )
 
 var (
