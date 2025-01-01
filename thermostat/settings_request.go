@@ -1,7 +1,7 @@
 package thermostat
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -108,7 +108,7 @@ func (sr *SettingsRequest) BuildRequest(req *http.Request) error {
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	body := params.Encode()
-	req.Body = ioutil.NopCloser(strings.NewReader(body))
+	req.Body = io.NopCloser(strings.NewReader(body))
 	req.ContentLength = int64(len(body))
 	return nil
 }
