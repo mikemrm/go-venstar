@@ -3,7 +3,6 @@ package thermostat
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -77,7 +76,7 @@ func TestBuildRequest(t *testing.T) {
 		if req.Body == nil {
 			t.Fatal("body is nil, want:", want)
 		}
-		got, err := ioutil.ReadAll(req.Body)
+		got, err := io.ReadAll(req.Body)
 		if err != nil {
 			t.Fatal("error produced reading body:", err)
 		}
@@ -95,7 +94,7 @@ type fakeThermostatClient struct {
 func (c *fakeThermostatClient) Do(_ *http.Request) (*http.Response, error) {
 	var body io.ReadCloser
 	if c.body != "" {
-		body = ioutil.NopCloser(strings.NewReader(c.body))
+		body = io.NopCloser(strings.NewReader(c.body))
 	}
 	resp := &http.Response{
 		Body: body,

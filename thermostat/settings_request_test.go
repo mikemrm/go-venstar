@@ -1,7 +1,7 @@
 package thermostat
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 )
@@ -267,7 +267,7 @@ func TestSettingsRequestBuildRequest(t *testing.T) {
 				return
 			}
 
-			body, err := ioutil.ReadAll(req.Body)
+			body, err := io.ReadAll(req.Body)
 			if err != nil {
 				t.Fatal("Unexpected body read error:", err)
 			}

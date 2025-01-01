@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -187,7 +186,7 @@ func DecodeBody(resp *http.Response, out interface{}) error {
 
 		var buf bytes.Buffer
 		tee := io.TeeReader(resp.Body, &buf)
-		resp.Body = ioutil.NopCloser(&buf)
+		resp.Body = io.NopCloser(&buf)
 		err := json.NewDecoder(tee).Decode(out)
 		if err != nil {
 			return errors.Wrap(err, "decoding json")
